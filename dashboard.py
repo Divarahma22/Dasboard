@@ -9,7 +9,7 @@ sns.set_theme(style="whitegrid", context="talk")
 
 # Tentukan path absolut ke file CSV dan gambar
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-data_path = os.path.join(BASE_DIR, 'C:/Users/ASUS TUF/Documents/DBS/Dasboard/data/dataset_baru.csv')
+data_path = os.path.join(BASE_DIR, 'dataset_baru.csv')
 
 # 🔹 Fungsi untuk membaca file CSV dengan fallback ke file_uploader
 def load_csv(file_name, label):
