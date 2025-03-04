@@ -14,31 +14,19 @@ os.makedirs(DATA_DIR, exist_ok=True)
 
 @st.cache_data
 def load_csv(file_name):
-    """Memuat file CSV jika tersedia, menampilkan pesan error jika tidak ditemukan."""
+    """Memuat file CSV dari folder 'data/'. Jika tidak ditemukan, tampilkan peringatan."""
     file_path = os.path.join(DATA_DIR, file_name)
     if os.path.exists(file_path):
         return pd.read_csv(file_path)
     else:
-        st.error(f"❌ File **{file_name}** tidak ditemukan. Harap unggah file di sidebar!")
+        st.warning(f"⚠️ File {file_name} tidak ditemukan di folder 'data/'. Harap pastikan file tersedia.")
         return None
 
-# **Tampilkan file uploader di sidebar**
-st.sidebar.header("📂 Unggah Dataset")
-uploaded_orders = st.sidebar.file_uploader("Unggah order_items_dataset.csv", type="csv")
-uploaded_payments = st.sidebar.file_uploader("Unggah order_payments_dataset.csv", type="csv")
+# Load dataset
+df_orders = load_csv("order_items_dataset.csv")
+df_payments = load_csv("order_payments_dataset.csv")
 
-# **Gunakan file yang diunggah jika ada, jika tidak baca dari folder data/**
-if uploaded_orders:
-    df_orders = pd.read_csv(uploaded_orders)
-else:
-    df_orders = load_csv("order_items_dataset.csv")
-
-if uploaded_payments:
-    df_payments = pd.read_csv(uploaded_payments)
-else:
-    df_payments = load_csv("order_payments_dataset.csv")
-
-# **Pastikan kedua dataset berhasil dimuat**
+# Pastikan kedua dataset tersedia sebelum diproses
 if df_orders is not None and df_payments is not None:
     # Merge dataset berdasarkan 'order_id'
     merged_df = df_orders.merge(df_payments, on="order_id", how="left")
@@ -68,4 +56,7 @@ if df_orders is not None and df_payments is not None:
         ax.set_title("Harga Rata-rata vs Cicilan")
         st.pyplot(fig)
 
-st.caption("📌 Copyright © 2024 | Dashboard E-Commerce")
+    st.caption("📌 Copyright © 2024 | Dashboard E-Commerce")
+
+else:
+    st.error("❌ Data tidak tersedia. Pastikan file CSV ada di folder 'data/'.")
