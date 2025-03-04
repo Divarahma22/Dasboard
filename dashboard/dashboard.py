@@ -8,23 +8,30 @@ import seaborn as sns
 sns.set_theme(style="whitegrid", context="talk")
 
 # Path folder 'data'
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # Gunakan absolute path
 DATA_DIR = os.path.join(BASE_DIR, "data")
-os.makedirs(DATA_DIR, exist_ok=True)
+
+# Cek apakah folder 'data' sudah ada
+if not os.path.exists(DATA_DIR):
+    st.error("❌ Folder 'data/' tidak ditemukan! Pastikan dataset tersedia.")
+    st.stop()
 
 @st.cache_data
 def load_csv(file_name):
     """Memuat file CSV dari folder 'data/'."""
     file_path = os.path.join(DATA_DIR, file_name)
-    return pd.read_csv(file_path) if os.path.exists(file_path) else None
+    if os.path.exists(file_path):
+        return pd.read_csv(file_path)
+    return None  # Jangan tampilkan warning, cukup return None
 
-# Load dataset
+# Load dataset tanpa unggahan manual
 df_orders = load_csv("order_items_dataset.csv")
 df_payments = load_csv("order_payments_dataset.csv")
 
-# **Langsung hentikan aplikasi jika data tidak tersedia tanpa peringatan**
+# Jika salah satu dataset tidak ditemukan, hentikan aplikasi
 if df_orders is None or df_payments is None:
-    st.stop()  # Aplikasi berhenti diam-diam
+    st.error("❌ Data tidak tersedia. Pastikan file CSV ada di folder 'data/'.")
+    st.stop()
 
 # Merge dataset berdasarkan 'order_id'
 merged_df = df_orders.merge(df_payments, on="order_id", how="left")
@@ -55,3 +62,4 @@ if 'payment_installments' in merged_df.columns and 'price' in merged_df.columns:
     st.pyplot(fig)
 
 st.caption("📌 Copyright © 2024 | Dashboard E-Commerce")
+
