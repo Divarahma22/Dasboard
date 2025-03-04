@@ -4,6 +4,7 @@ import seaborn as sns
 import streamlit as st
 import os
 
+# 🔹 Set gaya visualisasi
 sns.set(style='dark')
 
 # 🔹 Fungsi untuk membaca file CSV dengan fallback ke file_uploader
@@ -15,8 +16,7 @@ def load_csv(file_name, label):
         uploaded_file = st.file_uploader(f"📂 Unggah {label}", type=["csv"])
         if uploaded_file is not None:
             return pd.read_csv(uploaded_file)
-        else:
-            return None
+        return None
 
 # 🔹 Load dataset
 order_items_df = load_csv("order_items_dataset.csv", "Order Items Dataset")
@@ -37,7 +37,8 @@ merged_df = order_items_df.merge(order_payments_df, on="order_id", how="inner")
 
 # 🔹 Pastikan 'shipping_limit_date' ada & ubah ke datetime
 if 'shipping_limit_date' in merged_df.columns:
-    merged_df['shipping_limit_date'] = pd.to_datetime(merged_df['shipping_limit_date'])
+    merged_df['shipping_limit_date'] = pd.to_datetime(merged_df['shipping_limit_date'], errors='coerce')
+    merged_df = merged_df.dropna(subset=['shipping_limit_date'])  # Hapus data error
 else:
     st.error("❌ Kolom 'shipping_limit_date' tidak ditemukan dalam dataset.")
     st.stop()
@@ -49,8 +50,8 @@ min_date, max_date = merged_df['shipping_limit_date'].min(), merged_df['shipping
 start_date, end_date = st.sidebar.date_input("📆 Rentang Waktu", [min_date, max_date], min_value=min_date, max_value=max_date)
 
 # 🔹 Filter data berdasarkan tanggal yang dipilih
-filtered_df = merged_df[(merged_df['shipping_limit_date'] >= str(start_date)) & 
-                         (merged_df['shipping_limit_date'] <= str(end_date))]
+filtered_df = merged_df[(merged_df['shipping_limit_date'] >= pd.Timestamp(start_date)) & 
+                         (merged_df['shipping_limit_date'] <= pd.Timestamp(end_date))]
 
 # 🔹 Cek apakah data setelah filter kosong
 if filtered_df.empty:
@@ -64,6 +65,7 @@ if 'payment_type' in filtered_df.columns and 'payment_value' in filtered_df.colu
     st.dataframe(payment_summary)
 else:
     st.warning("⚠️ Kolom 'payment_type' atau 'payment_value' tidak ditemukan.")
+    payment_summary = pd.DataFrame()  # Buat dataframe kosong
 
 # 🔹 Pastikan kolom 'payment_installments' & 'price' ada sebelum lanjut
 if 'payment_installments' in filtered_df.columns and 'price' in filtered_df.columns:
@@ -72,6 +74,7 @@ if 'payment_installments' in filtered_df.columns and 'price' in filtered_df.colu
     st.dataframe(installment_price)
 else:
     st.warning("⚠️ Kolom 'payment_installments' atau 'price' tidak ditemukan.")
+    installment_price = pd.DataFrame()  # Buat dataframe kosong
 
 # 🔹 Visualisasi Total Pembayaran per Metode
 if not payment_summary.empty:
@@ -79,6 +82,8 @@ if not payment_summary.empty:
     fig, ax = plt.subplots(figsize=(10, 5))
     sns.barplot(x='payment_type', y='payment_value', data=payment_summary, ax=ax, palette="Blues")
     ax.set_title("Total Pembayaran per Metode")
+    ax.set_xlabel("Metode Pembayaran")
+    ax.set_ylabel("Total Pembayaran")
     st.pyplot(fig)
 
 # 🔹 Visualisasi Harga Rata-rata vs Cicilan
@@ -87,8 +92,11 @@ if not installment_price.empty:
     fig, ax = plt.subplots(figsize=(10, 5))
     sns.lineplot(x='payment_installments', y='price', data=installment_price, marker='o', color='b')
     ax.set_title("Harga Rata-rata vs Cicilan")
+    ax.set_xlabel("Jumlah Cicilan")
+    ax.set_ylabel("Harga Rata-rata (Rp)")
     st.pyplot(fig)
 
-st.caption
+st.caption("📌 Copyright © 2024")
+
 
 
