@@ -16,14 +16,15 @@ os.makedirs(DATA_DIR, exist_ok=True)
 def load_csv(file_name):
     """Memuat file CSV dari folder 'data/'."""
     file_path = os.path.join(DATA_DIR, file_name)
-    if os.path.exists(file_path):
-        return pd.read_csv(file_path)
-    else:
-        return None  # Jangan tampilkan warning, cukup return None
+    return pd.read_csv(file_path) if os.path.exists(file_path) else None
 
 # Load dataset
 df_orders = load_csv("order_items_dataset.csv")
 df_payments = load_csv("order_payments_dataset.csv")
+
+# **Langsung hentikan aplikasi jika data tidak tersedia tanpa peringatan**
+if df_orders is None or df_payments is None:
+    st.stop()  # Aplikasi berhenti diam-diam
 
 # Merge dataset berdasarkan 'order_id'
 merged_df = df_orders.merge(df_payments, on="order_id", how="left")
