@@ -12,7 +12,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# Fungsi membaca dataset atau membuat dummy jika kosong
 @st.cache_data
 def load_csv(file_name, label):
     file_path = os.path.join(DATA_DIR, file_name)
@@ -21,22 +20,28 @@ def load_csv(file_name, label):
         st.success(f"✅ File {file_name} ditemukan.")
         return pd.read_csv(file_path)
 
-    # Jika file tidak ada, buat dummy dataset agar dashboard tetap tampil
+    # Jika file tidak ada, buat dummy dataset dan simpan sebagai file CSV
     st.warning(f"⚠️ File {file_name} tidak ditemukan. Menggunakan data dummy sementara.")
-    
+
     if file_name == "order_items_dataset.csv":
-        return pd.DataFrame({
+        dummy_data = pd.DataFrame({
             "order_id": ["ORD1", "ORD2", "ORD3"],
             "price": [100000, 150000, 200000]
         })
     elif file_name == "order_payments_dataset.csv":
-        return pd.DataFrame({
+        dummy_data = pd.DataFrame({
             "order_id": ["ORD1", "ORD2", "ORD3"],
             "payment_type": ["credit_card", "boleto", "debit_card"],
             "payment_value": [100000, 150000, 200000],
             "payment_installments": [1, 2, 3]
         })
-    return None
+    else:
+        return None
+
+    # Simpan dummy dataset ke dalam file CSV agar tidak perlu buat ulang setiap kali dijalankan
+    dummy_data.to_csv(file_path, index=False)
+    return dummy_data
+
 
 # Load dataset
 df_orders = load_csv("order_items_dataset.csv", "Order Items Dataset")
