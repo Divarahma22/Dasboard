@@ -3,7 +3,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import matplotlib.pyplot as plt
+print(plt)
 # Atur gaya Seaborn
 sns.set_theme(style="whitegrid", context="talk")
 
