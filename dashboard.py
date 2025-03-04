@@ -1,11 +1,15 @@
+import os
+import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import streamlit as st
-import os
 
-# 🔹 Set gaya visualisasi
-sns.set(style='dark')
+# Atur gaya Seaborn
+sns.set_theme(style="whitegrid", context="talk")
+
+# Tentukan path absolut ke file CSV dan gambar
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+data_path = os.path.join(BASE_DIR, "dataset_baru.csv")
 
 # 🔹 Fungsi untuk membaca file CSV dengan fallback ke file_uploader
 def load_csv(file_name, label):
