@@ -25,11 +25,6 @@ def load_csv(file_name):
 df_orders = load_csv("order_items_dataset.csv")
 df_payments = load_csv("order_payments_dataset.csv")
 
-# Pastikan kedua dataset tersedia sebelum diproses
-if df_orders is None or df_payments is None:
-    st.error("❌ Data tidak tersedia. Pastikan file CSV ada di folder 'data/'.")
-    st.stop()  # Hentikan aplikasi jika data tidak ada
-
 # Merge dataset berdasarkan 'order_id'
 merged_df = df_orders.merge(df_payments, on="order_id", how="left")
 
