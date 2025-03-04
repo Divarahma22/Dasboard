@@ -9,7 +9,7 @@ sns.set_theme(style="whitegrid", context="talk")
 
 # Path folder 'data'
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # Gunakan absolute path
-DATA_DIR = os.path.join(BASE_DIR, "data")
+DATA_DIR = os.path.join(BASE_DIR, "data/")
 
 # Cek apakah folder 'data' sudah ada
 if not os.path.exists(DATA_DIR):
